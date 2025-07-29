@@ -1,21 +1,14 @@
 import { Observable, map } from 'observable-fns'
 import { authStatus } from '../auth/authStatus'
-import { logError } from '../logger'
 import {
-    debounceTime,
     firstValueFrom,
-    pick,
-    promiseFactoryToObservable,
     storeLastValue,
 } from '../misc/observable'
 import {
     firstResultFromOperation,
     pendingOperation,
-    switchMapReplayOperation,
 } from '../misc/observableOperation'
-import { isError } from '../utils'
 import { isDotCom } from './environments'
-import { graphqlClient } from './graphql'
 
 export interface UserProductSubscription {
     // TODO(sqs): this is the only field related to the user's subscription we were using previously
@@ -31,49 +24,13 @@ export interface UserProductSubscription {
 }
 
 /**
- * Observe the currently authenticated user's Cody subscription status (for Sourcegraph.com Cody
- * Free/Pro users only).
+ * For local development with Ollama only - always return null subscription
+ * (treating all users as enterprise users with full access)
  */
 export const userProductSubscription: Observable<
     UserProductSubscription | null | typeof pendingOperation
 > = authStatus.pipe(
-    pick('authenticated', 'endpoint', 'pendingValidation'),
-    debounceTime(0),
-    switchMapReplayOperation(
-        (authStatus): Observable<UserProductSubscription | Error | null | typeof pendingOperation> => {
-            if (authStatus.pendingValidation) {
-                return Observable.of(pendingOperation)
-            }
-
-            if (!authStatus.authenticated) {
-                return Observable.of(null)
-            }
-
-            if (!isDotCom(authStatus)) {
-                return Observable.of(null)
-            }
-
-            return promiseFactoryToObservable(signal =>
-                graphqlClient.getCurrentUserCodySubscription(signal)
-            ).pipe(
-                map((sub): UserProductSubscription | null | typeof pendingOperation => {
-                    if (isError(sub)) {
-                        logError(
-                            'userProductSubscription',
-                            `Failed to get the Cody product subscription info from ${authStatus.endpoint}: ${sub}`
-                        )
-                        return null
-                    }
-                    const isActiveProUser =
-                        sub !== null && 'plan' in sub && sub.plan === 'PRO' && sub.status !== 'PENDING'
-                    return {
-                        userCanUpgrade: !isActiveProUser,
-                    }
-                })
-            )
-        }
-    ),
-    map(result => (isError(result) ? null : result)) // the operation catches its own errors, so errors will never get here
+    map(() => null) // Always return null to bypass all subscription checks
 )
 
 const userProductSubscriptionStorage = storeLastValue(userProductSubscription)

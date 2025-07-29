@@ -28,7 +28,7 @@ import { RestClient } from '../sourcegraph-api/rest/client'
 import type { UserProductSubscription } from '../sourcegraph-api/userProductSubscription'
 import { telemetryRecorder } from '../telemetry-v2/singleton'
 import { CHAT_INPUT_TOKEN_BUDGET } from '../token/constants'
-import { isError } from '../utils'
+
 import { type Model, type ServerModel, createModel, createModelFromServerModel } from './model'
 import type {
     DefaultsAndUserPreferencesForEndpoint,
@@ -497,20 +497,12 @@ export function syncModels({
                     return pendingOperation
                 }
 
-                // Calculate isRateLimited directly from the current authStatus
-                const isRateLimited = !!(
-                    'rateLimited' in currentAuthStatus && currentAuthStatus.rateLimited
-                )
-
+                // For local development, only return Ollama models and no server models
                 return {
                     localModels,
-                    primaryModels: isError(remoteModelsData)
-                        ? []
-                        : normalizeModelList(remoteModelsData.primaryModels),
-                    preferences: isError(remoteModelsData)
-                        ? userModelPreferences
-                        : resolveModelPreferences(remoteModelsData.preferences, userModelPreferences),
-                    isRateLimited,
+                    primaryModels: [], // Remove all server-side models, only use Ollama
+                    preferences: userModelPreferences,
+                    isRateLimited: false, // Never rate limited for local development
                 }
             }
         ),
@@ -528,6 +520,8 @@ export function syncModels({
     )
 }
 
+// Disabled for local development
+/*
 function resolveModelPreferences(
     remote: Pick<DefaultsAndUserPreferencesForEndpoint, 'defaults'> | null,
     user: DefaultsAndUserPreferencesForEndpoint
@@ -553,10 +547,13 @@ function resolveModelPreferences(
     }
     return user
 }
+*/
 
 /**
  * Don't allow a BYOK model to shadow a model from the server.
  */
+// Disabled for local development
+/*
 function normalizeModelList(models: Model[]): Model[] {
     const modelsBYOK = models.filter(model => model.tags.includes(ModelTag.BYOK))
     const modelsNonBYOK = models.filter(model => !model.tags.includes(ModelTag.BYOK))
@@ -564,6 +561,7 @@ function normalizeModelList(models: Model[]): Model[] {
     const modelIDsNonBYOK = new Set(modelsNonBYOK.map(m => m.id))
     return [...modelsNonBYOK, ...modelsBYOK.filter(model => !modelIDsNonBYOK.has(model.id))]
 }
+*/
 
 export interface ChatModelProviderConfig {
     provider: string

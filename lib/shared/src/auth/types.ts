@@ -1,4 +1,3 @@
-import { isDotCom } from '../sourcegraph-api/environments'
 import type { AuthError } from '../sourcegraph-api/errors'
 import type { UserProductSubscription } from '../sourcegraph-api/userProductSubscription'
 
@@ -74,13 +73,16 @@ export const AUTH_STATUS_FIXTURE_AUTHED_DOTCOM: AuthenticatedAuthStatus = {
 }
 
 export function isCodyProUser(authStatus: AuthStatus, sub: UserProductSubscription | null): boolean {
-    return isDotCom(authStatus) && authStatus.authenticated && sub !== null && !sub.userCanUpgrade
+    // For local development, treat all users as enterprise (full access)
+    return false
 }
 
 export function isFreeUser(authStatus: AuthStatus, sub: UserProductSubscription | null): boolean {
-    return isDotCom(authStatus) && authStatus.authenticated && sub !== null && !!sub.userCanUpgrade
+    // For local development, no users are on free tier
+    return false
 }
 
 export function isEnterpriseUser(authStatus: AuthStatus): boolean {
-    return !isDotCom(authStatus)
+    // For local development, treat all users as enterprise users
+    return true
 }

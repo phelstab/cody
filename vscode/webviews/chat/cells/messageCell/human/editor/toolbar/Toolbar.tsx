@@ -152,7 +152,7 @@ export const Toolbar: FunctionComponent<{
                     isCodyProUser={userInfo?.isCodyProUser}
                     manuallySelectIntent={setLastManuallySelectedIntent}
                 />
-                {models?.length >= 2 && (
+                {models?.length >= 1 && (
                     <ModelSelectFieldToolbarItem
                         models={models}
                         userInfo={userInfo}

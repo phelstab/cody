@@ -1,6 +1,7 @@
 import {
     type AuthCredentials,
     type AuthStatus,
+    type AuthenticatedAuthStatus,
     type ClientCapabilitiesWithLegacyFields,
     ClientConfigSingleton,
     DOTCOM_URL,
@@ -332,7 +333,66 @@ class AuthProvider implements vscode.Disposable {
     }
 }
 
-export const authProvider = new AuthProvider()
+// Create a default authenticated user for local development
+const DEFAULT_LAMBDA_USER: AuthenticatedAuthStatus = {
+    endpoint: DOTCOM_URL.toString(), // Use default endpoint to match config
+    authenticated: true,
+    username: 'lambda',
+    pendingValidation: false,
+    displayName: 'Lambda User',
+    primaryEmail: 'lambda@localhost',
+    hasVerifiedEmail: true,
+    requiresVerifiedEmail: false,
+}
+
+class LocalAuthProvider implements vscode.Disposable {
+    private status = new Subject<AuthStatus>()
+    
+    constructor() {
+        // Set up the auth status observable
+        setAuthStatusObservable_(this.status.pipe(distinctUntilChanged()))
+        
+        // Immediately set the default authenticated status
+        setTimeout(() => {
+            this.status.next(DEFAULT_LAMBDA_USER)
+        }, 0)
+    }
+
+    async validateAndStoreCredentials(
+        config?: ResolvedConfigurationCredentialsOnly | AuthCredentials,
+        mode?: 'store-if-valid' | 'always-store'
+    ): Promise<AuthStatus> {
+        // Always return success for local development
+        this.status.next(DEFAULT_LAMBDA_USER)
+        return Promise.resolve(DEFAULT_LAMBDA_USER)
+    }
+
+    public refresh(resetInitialAuthStatus = true): void {
+        // For local development, just re-emit the same authenticated status
+        this.status.next(DEFAULT_LAMBDA_USER)
+    }
+
+    public signout(endpoint: string): void {
+        // For local development, don't actually sign out
+        this.status.next(DEFAULT_LAMBDA_USER)
+    }
+
+    public setAuthPendingToEndpoint(endpoint: string): void {
+        // For local development, immediately set as authenticated
+        this.status.next(DEFAULT_LAMBDA_USER)
+    }
+
+    public async serializeUninstallerInfo(authStatus: AuthStatus): Promise<void> {
+        // No-op for local development
+        return Promise.resolve()
+    }
+
+    dispose(): void {
+        // No cleanup needed for local auth
+    }
+}
+
+export const authProvider = new LocalAuthProvider()
 
 /**
  * @internal For testing only.

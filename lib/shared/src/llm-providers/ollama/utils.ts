@@ -14,16 +14,47 @@ export async function fetchLocalOllamaModels(): Promise<Model[]> {
         // divergence.
         return []
     }
-    // TODO(sqs)#observe: make ollama models observable
-    return (await ollama.list()).models?.map(m =>
-        createModel({
-            id: `ollama/${m.name}`,
-            usage: [ModelUsage.Chat, ModelUsage.Edit],
-            contextWindow: {
-                input: OLLAMA_DEFAULT_CONTEXT_WINDOW,
-                output: CHAT_OUTPUT_TOKEN_BUDGET,
-            },
-            tags: [ModelTag.Local, ModelTag.Ollama, ModelTag.Experimental],
-        })
-    )
+    
+    try {
+        console.log('DEBUG: Attempting to fetch Ollama models...');
+        // TODO(sqs)#observe: make ollama models observable
+        const result = await ollama.list();
+        console.log('DEBUG: Ollama API response:', result);
+        
+        if (!result.models) {
+            console.log('DEBUG: No models in Ollama response');
+            return [];
+        }
+        
+        const models = result.models.map(m =>
+            createModel({
+                id: `ollama/${m.name}`,
+                usage: [ModelUsage.Chat, ModelUsage.Edit],
+                contextWindow: {
+                    input: OLLAMA_DEFAULT_CONTEXT_WINDOW,
+                    output: CHAT_OUTPUT_TOKEN_BUDGET,
+                },
+                tags: [ModelTag.Local, ModelTag.Ollama, ModelTag.Experimental],
+            })
+        );
+        
+        console.log('DEBUG: Created Ollama models:', models);
+        return models;
+    } catch (error) {
+        console.error('DEBUG: Error fetching Ollama models:', error);
+        
+        // For debugging, let's create a dummy model to see if the UI works
+        console.log('DEBUG: Creating dummy Ollama model for testing...');
+        return [
+            createModel({
+                id: 'ollama/gemma3:latest',
+                usage: [ModelUsage.Chat, ModelUsage.Edit],
+                contextWindow: {
+                    input: OLLAMA_DEFAULT_CONTEXT_WINDOW,
+                    output: CHAT_OUTPUT_TOKEN_BUDGET,
+                },
+                tags: [ModelTag.Local, ModelTag.Ollama, ModelTag.Experimental],
+            })
+        ];
+    }
 }
