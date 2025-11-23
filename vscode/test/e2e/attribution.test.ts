@@ -5,9 +5,7 @@ import * as mockServer from '../fixtures/mock-server'
 import { getChatInputs, getChatSidebarPanel, sidebarSignin } from './common'
 
 import type { SearchAttributionResponse } from '@sourcegraph/cody-shared/src/sourcegraph-api/graphql/client'
-import { type DotcomUrlOverride, test as baseTest } from './helpers'
-
-const test = baseTest.extend<DotcomUrlOverride>({ dotcomUrl: mockServer.SERVER_URL })
+import { test } from './helpers'
 
 test('attribution search enabled in chat', async ({ page, sidebar, server }) => {
     server.onGraphQl('SnippetAttribution').replyJson({

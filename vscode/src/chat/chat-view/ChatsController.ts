@@ -225,6 +225,9 @@ export class ChatsController implements vscode.Disposable {
 
             vscode.commands.registerCommand('cody.chat.toggle', async () => this.toggleChatPanel()),
             vscode.commands.registerCommand('cody.chat.history.export', () => this.exportHistory()),
+            vscode.commands.registerCommand('cody.chat.history.export.all', () =>
+                this.exportAllChatsUnauthenticated()
+            ),
             vscode.commands.registerCommand('cody.chat.history.clear', arg => this.clearHistory(arg)),
             vscode.commands.registerCommand('cody.chat.history.delete', item => this.clearHistory(item)),
             vscode.commands.registerCommand('cody.chat.history.rename', arg => this.renameHistory(arg)),
@@ -426,6 +429,76 @@ export class ChatsController implements vscode.Disposable {
             } catch (error) {
                 logError('ChatsController:exportHistory', 'Failed to export chat history', error)
             }
+        }
+    }
+
+    /**
+     * Export all chat history to file system without authentication check
+     * Useful for users who can't authenticate but still have local chat data
+     */
+    private async exportAllChatsUnauthenticated(): Promise<void> {
+        telemetryRecorder.recordEvent('cody.exportAllChats', 'clicked', {
+            billingMetadata: {
+                product: 'cody',
+                category: 'billable',
+            },
+        })
+
+        try {
+            // Access all chat history directly from local storage, regardless of auth status
+            const allChatHistory = localStorage.getAllChatHistory()
+
+            if (!allChatHistory || Object.keys(allChatHistory).length === 0) {
+                void vscode.window.showInformationMessage('No chat history found to export.')
+                return
+            }
+
+            // Flatten all chat histories into a single export
+            const allChats = Object.values(allChatHistory).flatMap(userHistory =>
+                Object.values(userHistory.chat || {})
+            )
+
+            if (allChats.length === 0) {
+                void vscode.window.showInformationMessage('No chat history found to export.')
+                return
+            }
+
+            // Use workspace folder as default location, fallback to home directory
+            const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri
+            const defaultDir = workspaceFolder || vscode.Uri.file(require('node:os').homedir())
+            const filename = `cody-all-chats-${new Date().toISOString().slice(0, 10)}.json`
+
+            const exportPath = await vscode.window.showSaveDialog({
+                title: 'Cody: Export All Chat History',
+                filters: { 'Chat History': ['json'] },
+                defaultUri: vscode.Uri.joinPath(defaultDir, filename),
+            })
+
+            if (!exportPath) {
+                return
+            }
+
+            const logContent = new TextEncoder().encode(JSON.stringify(allChats, null, 2))
+            await vscode.workspace.fs.writeFile(exportPath, logContent)
+
+            // Display message and ask if user wants to open file
+            void vscode.window
+                .showInformationMessage(
+                    `Successfully exported ${allChats.length} chat conversations.`,
+                    'Open'
+                )
+                .then(choice => {
+                    if (choice === 'Open') {
+                        void vscode.commands.executeCommand('vscode.open', exportPath)
+                    }
+                })
+        } catch (error) {
+            logError(
+                'ChatsController:exportAllChatsUnauthenticated',
+                'Failed to export all chat history',
+                error
+            )
+            void vscode.window.showErrorMessage('Failed to export chat history. See output for details.')
         }
     }
 

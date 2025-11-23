@@ -11,7 +11,6 @@ import com.sourcegraph.cody.agent.protocol_extensions.ProtocolTextDocumentExt
 import com.sourcegraph.cody.agent.protocol_generated.ExecuteCommandParams
 import com.sourcegraph.cody.agent.protocol_generated.Ignore_TestResult
 import com.sourcegraph.cody.auth.CodyAuthService
-import com.sourcegraph.cody.commands.CommandId
 import com.sourcegraph.cody.ignore.ActionInIgnoredFileNotification
 import com.sourcegraph.cody.ignore.IgnoreOracle
 import com.sourcegraph.common.ui.DumbAwareEDTAction
@@ -19,9 +18,7 @@ import com.sourcegraph.config.ConfigUtil.isCodyEnabled
 import com.sourcegraph.utils.CodyEditorUtil
 import java.util.concurrent.Callable
 
-abstract class BaseCommandAction : DumbAwareEDTAction() {
-
-  abstract val myCommandId: CommandId
+abstract class BaseCommandAction(val id: String) : DumbAwareEDTAction() {
 
   override fun actionPerformed(event: AnActionEvent) {
     doAction(event.project ?: return)
@@ -48,11 +45,7 @@ abstract class BaseCommandAction : DumbAwareEDTAction() {
                 CodyAgentService.withAgent(project) { agent ->
                   agent.server.command_execute(
                       ExecuteCommandParams(
-                          command =
-                              when (myCommandId) {
-                                CommandId.Explain -> "cody.command.explain-code"
-                                CommandId.Smell -> "cody.command.smell-code"
-                              },
+                          command = id,
                           arguments = emptyList(),
                       ))
                 }

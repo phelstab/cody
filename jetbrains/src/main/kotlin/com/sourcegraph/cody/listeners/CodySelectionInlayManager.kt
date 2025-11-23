@@ -14,6 +14,7 @@ import com.intellij.openapi.util.Disposer
 import com.sourcegraph.cody.agent.CodyAgentService
 import com.sourcegraph.cody.agent.protocol_generated.Ignore_TestResult
 import com.sourcegraph.cody.auth.CodyAuthService
+import com.sourcegraph.cody.chat.actions.EditCodeAction
 import com.sourcegraph.cody.ignore.IgnoreOracle
 import com.sourcegraph.config.ConfigUtil
 import com.sourcegraph.utils.CodyEditorUtil
@@ -56,8 +57,8 @@ class CodySelectionInlayManager(val project: Project) {
     if (startLine == selectionEndLine) {
       return
     }
-    val editShortcutText = getKeyStrokeText("cody.editCodeAction")
-    val inlayContent = "$editShortcutText  to Edit"
+    val editShortcutText = getKeyStrokeText(EditCodeAction.ID)
+    val inlayContent = "$editShortcutText to Edit"
 
     val bottomLine = // Try to put it beneath the selection. At the end was unpopular.
         if (selectionEndLine + 1 < document.lineCount) selectionEndLine + 1 else selectionEndLine

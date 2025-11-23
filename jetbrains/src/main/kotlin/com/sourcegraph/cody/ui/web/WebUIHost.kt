@@ -15,6 +15,7 @@ import com.sourcegraph.cody.agent.protocol_generated.DefiniteWebviewOptions
 import com.sourcegraph.cody.agent.protocol_generated.ExecuteCommandParams
 import com.sourcegraph.cody.agent.protocol_generated.Webview_DidDisposeNativeParams
 import com.sourcegraph.cody.agent.protocol_generated.Webview_ReceiveMessageStringEncodedParams
+import com.sourcegraph.cody.chat.actions.EditCodeAction
 import com.sourcegraph.cody.config.ui.CodyConfigurable
 import com.sourcegraph.utils.CodyEditorUtil
 import java.net.URLDecoder
@@ -79,7 +80,7 @@ internal class WebUIHostImpl(
       runInEdt {
         // Invoke the Cody "edit" action in JetBrains directly.
         val actionManager = ActionManager.getInstance()
-        val action = actionManager.getAction("cody.editCodeAction")
+        val action = actionManager.getAction(EditCodeAction.ID)
         val dataContext =
             CodyEditorUtil.getSelectedEditors(project).firstOrNull()?.let { editor ->
               SimpleDataContext.getSimpleContext(CommonDataKeys.EDITOR, editor)

@@ -1,7 +1,7 @@
 package com.sourcegraph.cody.edit
 
 import com.intellij.openapi.command.WriteCommandAction
-import com.sourcegraph.cody.edit.actions.DocumentCodeAction
+import com.sourcegraph.cody.chat.actions.DocumentCodeAction
 import com.sourcegraph.cody.edit.lenses.LensesService
 import com.sourcegraph.cody.edit.lenses.actions.EditAcceptAction
 import com.sourcegraph.cody.edit.lenses.actions.EditCancelAction

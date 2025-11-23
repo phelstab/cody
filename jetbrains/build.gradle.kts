@@ -60,10 +60,10 @@ plugins {
   id("java")
   id("jvm-test-suite")
   id("org.jetbrains.kotlin.jvm") version "2.2.0"
-  id("org.jetbrains.intellij.platform") version "2.6.0"
-  id("org.jetbrains.changelog") version "2.2.1"
-  id("com.diffplug.spotless") version "7.0.2"
-  id("io.sentry.jvm.gradle") version "5.2.0"
+  id("org.jetbrains.intellij.platform") version "2.7.0"
+  id("org.jetbrains.changelog") version "2.3.0"
+  id("com.diffplug.spotless") version "7.2.1"
+  id("io.sentry.jvm.gradle") version "5.8.0"
 }
 
 val platformVersion: String by project

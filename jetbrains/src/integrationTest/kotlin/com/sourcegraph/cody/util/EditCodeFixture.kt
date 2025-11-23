@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.sourcegraph.cody.agent.CodyAgentService
 import com.sourcegraph.cody.agent.protocol_generated.ClientCapabilities
 import com.sourcegraph.cody.agent.protocol_generated.ProtocolCodeLens
+import com.sourcegraph.cody.chat.actions.DocumentCodeAction
 import com.sourcegraph.cody.edit.lenses.LensListener
 import com.sourcegraph.cody.edit.lenses.LensesService
 import com.sourcegraph.cody.edit.lenses.providers.EditAcceptCodeVisionProvider
@@ -21,7 +22,7 @@ import org.junit.Assert.fail
 class EditCodeFixture(recordingName: String) :
     BaseIntegrationTextFixture(
         recordingName,
-        credentials = TestingCredentials.dotcom,
+        credentials = TestingCredentials.s2,
         CodyAgentService.clientCapabilities.copy(
             globalState = ClientCapabilities.GlobalStateEnum.Stateless)),
     LensListener {
@@ -30,11 +31,14 @@ class EditCodeFixture(recordingName: String) :
   override fun checkInitialConditionsForOpenFile() {
 
     // Check the initial state of the action's presentation
-    val action = ActionManager.getInstance().getAction("cody.documentCodeAction")
+    val action = ActionManager.getInstance().getAction(DocumentCodeAction.ID)
     val event = AnActionEvent.createFromAnAction(action, null, "", createEditorContext(editor))
     action.update(event)
     val presentation = event.presentation
-    assertEquals("Action description should be empty", "", presentation.description)
+    assertEquals(
+        "Action description should be present",
+        "Documents the selected code",
+        presentation.description)
     assertTrue("Action should be enabled", presentation.isEnabled)
     assertTrue("Action should be visible", presentation.isVisible)
   }

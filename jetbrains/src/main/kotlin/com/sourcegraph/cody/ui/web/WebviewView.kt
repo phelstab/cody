@@ -9,6 +9,7 @@ import com.sourcegraph.cody.agent.protocol_generated.Webview_ResolveWebviewViewP
 import java.awt.AWTEvent
 import java.awt.Toolkit
 import java.awt.event.AWTEventListener
+import java.awt.event.PaintEvent
 
 /// A view that can host a browser component.
 private interface WebviewHost {
@@ -30,7 +31,12 @@ internal class CodyToolWindowContentWebviewHost(private val owner: CodyToolWindo
   var proxy: WebUIProxy? = null
     private set
 
-  private var displayChangeListener = AWTEventListener { proxy?.forceRepaint() }
+  private var displayChangeListener = AWTEventListener { event ->
+    val updateRectSize = (event as? PaintEvent)?.updateRect?.size
+    if (updateRectSize == null || updateRectSize.height > 0 || updateRectSize.width > 0) {
+      proxy?.forceRepaint()
+    }
+  }
 
   override val viewDelegate =
       object : WebviewViewDelegate {

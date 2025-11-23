@@ -1,37 +1,16 @@
 import { expect } from '@playwright/test'
 
-import * as mockServer from '../fixtures/mock-server'
 import {
     chatInputMentions,
     clickEditorTab,
     createEmptyChatPanel,
-    getChatInputs,
-    getChatSidebarPanel,
     mentionMenu,
     mentionMenuItems,
     openFileInEditorTab,
     selectLineRangeInEditorTab,
     sidebarSignin,
 } from './common'
-import {
-    type DotcomUrlOverride,
-    type WorkspaceDirectory,
-    mockEnterpriseRepoMapping,
-    test,
-    testWithGitRemote,
-} from './helpers'
-
-testWithGitRemote.extend<DotcomUrlOverride>({ dotcomUrl: mockServer.SERVER_URL })(
-    'initial context - self-serve repo',
-    async ({ page, sidebar }) => {
-        await sidebarSignin(page, sidebar)
-        const chatFrame = getChatSidebarPanel(page)
-        const lastChatInput = getChatInputs(chatFrame).last()
-
-        // The current repository should be initially present in the chat input.
-        await expect(chatInputMentions(lastChatInput)).toHaveText(['myrepo'])
-    }
-)
+import { type WorkspaceDirectory, mockEnterpriseRepoMapping, test, testWithGitRemote } from './helpers'
 
 testWithGitRemote('initial context - enterprise repo', async ({ page, sidebar, server }) => {
     mockEnterpriseRepoMapping(server, 'codehost.example/user/myrepo')
@@ -74,25 +53,21 @@ testWithGitRemote('initial context - file', async ({ page, sidebar, server }) =>
 })
 
 // Test with multi-root workspace to verify initial context switches between workspace folders
-const testWithMultiRoot = test
-    .extend<DotcomUrlOverride>({
-        dotcomUrl: mockServer.SERVER_URL,
-    })
-    .extend<WorkspaceDirectory>({
-        // biome-ignore lint/correctness/noEmptyPattern: Playwright needs empty pattern to specify "no dependencies".
-        workspaceDirectory: async ({}, use) => {
-            const path = require('node:path')
-            const vscodeRoot = path.resolve(__dirname, '..', '..')
-            // Use the multi-root.code-workspace file to load both workspace and workspace2 folders
-            const multiRootWorkspaceFile = path.join(
-                vscodeRoot,
-                'test',
-                'fixtures',
-                'multi-root.code-workspace'
-            )
-            await use(multiRootWorkspaceFile)
-        },
-    })
+const testWithMultiRoot = test.extend<WorkspaceDirectory>({
+    // biome-ignore lint/correctness/noEmptyPattern: Playwright needs empty pattern to specify "no dependencies".
+    workspaceDirectory: async ({}, use) => {
+        const path = require('node:path')
+        const vscodeRoot = path.resolve(__dirname, '..', '..')
+        // Use the multi-root.code-workspace file to load both workspace and workspace2 folders
+        const multiRootWorkspaceFile = path.join(
+            vscodeRoot,
+            'test',
+            'fixtures',
+            'multi-root.code-workspace'
+        )
+        await use(multiRootWorkspaceFile)
+    },
+})
 
 testWithMultiRoot(
     'initial context - switches between multi-root workspace folders',
@@ -105,6 +80,25 @@ testWithMultiRoot(
                     { name: 'github.com/sourcegraph/workspace2', id: 'workspace2-id' },
                 ],
             },
+        })
+
+        // Mock additional endpoints needed for enterprise context (from mockEnterpriseRepoMapping)
+        server.onGraphQl('Repositories').replyJson({
+            data: {
+                repositories: {
+                    nodes: [
+                        { id: 'workspace-id', name: 'github.com/sourcegraph/workspace' },
+                        { id: 'workspace2-id', name: 'github.com/sourcegraph/workspace2' },
+                    ],
+                    pageInfo: { endCursor: 'workspace2-id' },
+                },
+            },
+        })
+        server.onGraphQl('Repository').replyJson({
+            data: { repository: { id: 'workspace-id' } },
+        })
+        server.onGraphQl('ResolveRepoName').replyJson({
+            data: { repository: { name: 'github.com/sourcegraph/workspace' } },
         })
 
         await sidebarSignin(page, sidebar)

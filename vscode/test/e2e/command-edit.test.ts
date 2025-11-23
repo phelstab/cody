@@ -4,20 +4,16 @@ import * as mockServer from '../fixtures/mock-server'
 
 import { sidebarExplorer, sidebarSignin } from './common'
 import {
-    type DotcomUrlOverride,
     type ExpectedV2Events,
-    test as baseTest,
     stabilizeMetadataValues,
     stabilizePrivateMetadataValues,
+    test,
 } from './helpers'
-
-const test = baseTest.extend<DotcomUrlOverride>({ dotcomUrl: mockServer.SERVER_URL })
 
 test.extend<ExpectedV2Events>({
     // list of events we expect this test to log, add to this list as needed
     expectedV2Events: [
         'cody.extension:installed',
-        'cody.auth.login:clicked',
         'cody.auth.login:firstEver',
         'cody.auth.login.token:clicked',
         'cody.auth:connected',
@@ -100,7 +96,7 @@ test.extend<ExpectedV2Events>({
     await inputBox.focus()
     await inputBox.fill(instruction)
     await page.keyboard.press('Enter')
-    await nap()
+    await nap(500)
     await expect(page.getByText('appleName')).not.toBeVisible()
     await expect(page.getByText('bananaName')).toBeVisible()
 

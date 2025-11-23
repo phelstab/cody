@@ -2,15 +2,8 @@ import { expect } from '@playwright/test'
 import * as mockServer from '../fixtures/mock-server'
 
 import { sidebarSignin } from './common'
-import {
-    type DotcomUrlOverride,
-    type ExtraWorkspaceSettings,
-    test as baseTest,
-    executeCommandInPalette,
-} from './helpers'
+import { type ExtraWorkspaceSettings, executeCommandInPalette, test } from './helpers'
 import { testGitWorkspace } from './utils/gitWorkspace'
-
-const test = baseTest.extend<DotcomUrlOverride>({ dotcomUrl: mockServer.SERVER_URL })
 
 test.beforeEach(() => {
     mockServer.resetLoggedEvents()

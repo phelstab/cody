@@ -346,7 +346,7 @@ export const HumanMessageEditor: FunctionComponent<{
     const defaultContext = useDefaultContextForChat()
 
     useEffect(() => {
-        if (isSent || !isFirstMessage || !editorRef?.current || selectedIntent === 'agentic') {
+        if (isSent || !isFirstMessage || !editorRef?.current) {
             return
         }
 
@@ -364,7 +364,7 @@ export const HumanMessageEditor: FunctionComponent<{
         const filteredItems = defaultContext?.initialContext.filter(
             item => !excludedTypes.has(item.type)
         )
-        void editor.setInitialContextMentions(filteredItems)
+        void editor.setInitialContextMentions(selectedIntent === 'agentic' ? [] : filteredItems)
     }, [defaultContext?.initialContext, isSent, isFirstMessage, currentChatModel, selectedIntent])
 
     const focusEditor = useCallback(() => editorRef.current?.setFocus(true), [])

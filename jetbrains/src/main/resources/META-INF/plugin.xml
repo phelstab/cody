@@ -216,9 +216,9 @@
                     <override-text place="GoToAction" text="Cody: Open Chat"/>
                 </action>
 
-                <action id="cody.command.Explain"
+                <action id="cody.command.explain-code"
                         icon="/icons/chat/chatCommand.svg"
-                        class="com.sourcegraph.cody.chat.actions.ExplainCommand"
+                        class="com.sourcegraph.cody.chat.actions.ExplainCodeAction"
                         text="Explain Code"
                         description="Explains the selected code">
                     <keyboard-shortcut first-keystroke="ctrl alt 1" keymap="$default"/>
@@ -226,9 +226,9 @@
                     <override-text place="GoToAction" text="Cody: Explain Code"/>
                 </action>
 
-                <action id="cody.command.Smell"
+                <action id="cody.command.smell-code"
                         icon="/icons/chat/chatCommand.svg"
-                        class="com.sourcegraph.cody.chat.actions.SmellCommand"
+                        class="com.sourcegraph.cody.chat.actions.SmellCodeAction"
                         text="Find Code Smells"
                         description="Finds code smells in the selected code">
                     <keyboard-shortcut first-keystroke="ctrl alt 2" keymap="$default"/>
@@ -239,9 +239,9 @@
 
             <group id="Cody.EditCode" popup="true" searchable="false" text="Edit Code"
                    description="Cody inline edit actions">
-                <action id="cody.testCodeAction"
+                <action id="cody.command.unit-test"
                         icon="/icons/edit/generateTest.svg"
-                        class="com.sourcegraph.cody.edit.actions.TestCodeAction"
+                        class="com.sourcegraph.cody.chat.actions.UnitTestAction"
                         text="Generate Unit Tests"
                         description="Generates unit tests for the selected code">
                     <keyboard-shortcut first-keystroke="alt G" keymap="$default"/>
@@ -249,9 +249,9 @@
                     <override-text place="GoToAction" text="Cody: Generate Unit Tests"/>
                 </action>
 
-                <action id="cody.documentCodeAction"
+                <action id="cody.command.document-code"
                         icon="/icons/edit/documentCode.svg"
-                        class="com.sourcegraph.cody.edit.actions.DocumentCodeAction"
+                        class="com.sourcegraph.cody.chat.actions.DocumentCodeAction"
                         text="Document Code"
                         description="Documents the selected code">
                     <keyboard-shortcut first-keystroke="alt H" keymap="$default"/>
@@ -259,9 +259,9 @@
                     <override-text place="GoToAction" text="Cody: Document Code"/>
                 </action>
 
-                <action id="cody.editCodeAction"
+                <action id="cody.command.edit-code"
                         icon="/icons/edit/editCode.svg"
-                        class="com.sourcegraph.cody.edit.actions.EditCodeAction"
+                        class="com.sourcegraph.cody.chat.actions.EditCodeAction"
                         description="Opens the Edit Code dialog"
                         text="Edit Code...">
                     <keyboard-shortcut first-keystroke="alt K" keymap="$default"/>
@@ -436,12 +436,12 @@
                description="Cody actions">
             <add-to-group anchor="last" group-id="EditorPopupMenu"/>
 
-            <reference ref="cody.editCodeAction"/>
-            <reference ref="cody.documentCodeAction"/>
-            <reference ref="cody.testCodeAction"/>
+            <reference ref="cody.command.edit-code"/>
+            <reference ref="cody.command.document-code"/>
+            <reference ref="cody.command.unit-test"/>
             <separator/>
-            <reference ref="cody.command.Explain"/>
-            <reference ref="cody.command.Smell"/>
+            <reference ref="cody.command.explain-code"/>
+            <reference ref="cody.command.smell-code"/>
         </group>
     </actions>
 

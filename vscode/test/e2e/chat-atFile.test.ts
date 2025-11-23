@@ -1,6 +1,5 @@
 import { isWindows } from '@sourcegraph/cody-shared'
 import { expect } from 'playwright/test'
-import * as mockServer from '../fixtures/mock-server'
 import {
     atMentionMenuMessage,
     chatInputMentions,
@@ -17,7 +16,6 @@ import {
     sidebarSignin,
 } from './common'
 import {
-    type DotcomUrlOverride,
     type ExpectedV2Events,
     executeCommandInPalette,
     mockEnterpriseRepoIdMapping,
@@ -29,24 +27,17 @@ import {
 //
 // NOTE: Creating new chats is slow, and setup is slow, so collapse these into fewer tests.
 
-test
-    .extend<ExpectedV2Events>({
-        expectedV2Events: [
-            'cody.extension:installed',
-            'cody.auth.login:clicked',
-            'cody.auth.login:firstEver',
-            'cody.auth.login.token:clicked',
-            'cody.auth:connected',
-            'cody.chat-question:submitted',
-            'cody.chat-question:executed',
-            'cody.chatResponse:noCode',
-        ],
-    })
-    .extend<DotcomUrlOverride>({
-        // To exercise the "current directory" filename filtering without a git repository
-        // for the workspace, simulate dotcom.
-        dotcomUrl: mockServer.SERVER_URL,
-    })('@-mention file in chat', async ({ page, sidebar, workspaceDirectory, server }) => {
+test.extend<ExpectedV2Events>({
+    expectedV2Events: [
+        'cody.extension:installed',
+        'cody.auth.login:firstEver',
+        'cody.auth.login.token:clicked',
+        'cody.auth:connected',
+        'cody.chat-question:submitted',
+        'cody.chat-question:executed',
+        'cody.chatResponse:noCode',
+    ],
+})('@-mention file in chat', async ({ page, sidebar, workspaceDirectory, server }) => {
     mockEnterpriseRepoIdMapping(server)
 
     // This test requires that the window be focused in the OS window manager because it deals with
@@ -60,7 +51,9 @@ test
     await chatInput.dblclick()
     await chatInput.focus()
     await page.keyboard.type('@')
-    await expect(mentionMenu(chatPanelFrame).getByRole('option', { selected: true })).toHaveText('Files')
+    await expect(mentionMenu(chatPanelFrame).getByRole('option', { selected: true })).toHaveText(
+        'Repositories'
+    )
     await page.keyboard.press('Backspace')
 
     // No results
@@ -219,7 +212,6 @@ test
 test.extend<ExpectedV2Events>({
     expectedV2Events: [
         'cody.extension:installed',
-        'cody.auth.login:clicked',
         'cody.auth.login:firstEver',
         'cody.auth.login.token:clicked',
         'cody.auth:connected',
@@ -267,7 +259,6 @@ test.extend<ExpectedV2Events>({
 test.extend<ExpectedV2Events>({
     expectedV2Events: [
         'cody.extension:installed',
-        'cody.auth.login:clicked',
         'cody.auth.login:firstEver',
         'cody.auth.login.token:clicked',
         'cody.auth:connected',
@@ -305,7 +296,6 @@ test.extend<ExpectedV2Events>({
 test.extend<ExpectedV2Events>({
     expectedV2Events: [
         'cody.extension:installed',
-        'cody.auth.login:clicked',
         'cody.auth.login:firstEver',
         'cody.auth.login.token:clicked',
         'cody.auth:connected',

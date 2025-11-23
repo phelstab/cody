@@ -1,16 +1,12 @@
 import { expect } from '@playwright/test'
 
 import { CommandMenuOption as menu } from '../../src/commands/menus/items/options'
-import * as mockServer from '../fixtures/mock-server'
 import { sidebarExplorer, sidebarSignin } from './common'
-import { type DotcomUrlOverride, type ExpectedV2Events, test as baseTest } from './helpers'
-
-const test = baseTest.extend<DotcomUrlOverride>({ dotcomUrl: mockServer.SERVER_URL })
+import { type ExpectedV2Events, test } from './helpers'
 
 test.extend<ExpectedV2Events>({
     expectedV2Events: [
         'cody.extension:installed',
-        'cody.auth.login:clicked',
         'cody.auth.login:firstEver',
         'cody.auth.login.token:clicked',
         'cody.auth:connected',

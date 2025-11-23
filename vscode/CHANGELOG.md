@@ -4,6 +4,45 @@ This is a log of all notable changes to Cody for VS Code.
 
 <!--- {/_ CHANGELOG_START _/} -->
 
+## 1.116.0
+
+### Chore
+
+#### Ci
+
+- resolve issue with artifacts naming [#8195](https://github.com/sourcegraph/cody/pull/8195)
+
+#### Cody
+
+- update marketplace listing readme [#8214](https://github.com/sourcegraph/cody/pull/8214)
+
+### Refactor
+
+#### Search
+
+- remove search mode [#8053](https://github.com/sourcegraph/cody/pull/8053)
+
+### Reverts
+
+  There were no reverts for this release
+
+### Uncategorized
+
+#### Others
+
+- Fix sign-off logic, re-enable auth tests [#8201](https://github.com/sourcegraph/cody/pull/8201)
+- Update vscode package version [#8197](https://github.com/sourcegraph/cody/pull/8197)
+- Unblock main fix unit tests [#8194](https://github.com/sourcegraph/cody/pull/8194)
+- Changelog for 1.114.0 [#8193](https://github.com/sourcegraph/cody/pull/8193)
+- Chore: add deprecation notice to README [#8191](https://github.com/sourcegraph/cody/pull/8191)
+- Fix NPE exception reported by Sentry [#8188](https://github.com/sourcegraph/cody/pull/8188)
+- Update gradle toolchains resolver [#8186](https://github.com/sourcegraph/cody/pull/8186)
+- Add setting for enabling/disabling cody chat syntax highlighting [#8185](https://github.com/sourcegraph/cody/pull/8185)
+- Improve markdown component caching [#8183](https://github.com/sourcegraph/cody/pull/8183)
+- Remove redundant rename/delete workspace ops [#8181](https://github.com/sourcegraph/cody/pull/8181)
+- Fix empty files when saving code snippets from chat [#8180](https://github.com/sourcegraph/cody/pull/8180)
+- Fix auth form validation [#8178](https://github.com/sourcegraph/cody/pull/8178)
+
 ## 1.114.0
 
 ### Fix

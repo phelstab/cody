@@ -2,7 +2,7 @@
 > Cody transitioned to a private repo. This repository, `sourcegraph/cody-public-snapshot` is a publicly available copy of the `sourcegraph/cody` repository as it was just before the migration.
 
 > [!TIP]
-> If you are interested in working with the code, this [commit](https://github.com/sourcegraph/cody-public-snapshot/commit/d91e8e4a06233ddd80ad5618a313b66c1ea4ee7a) is the last one made under an Apache License.
+> If you are interested in working with the code, this [commit](https://github.com/sourcegraph/cody-public-snapshot/commit/d7fc6741e7893e3f6e29efe58043f1afe08d505f) is the last one made under an Apache License.
 
 ---
 

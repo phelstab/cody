@@ -179,6 +179,14 @@ class LocalStorage implements LocalStorageForModelPreferences {
         return history?.[accountKey] ?? { chat: {} }
     }
 
+    /**
+     * Get all chat history for all accounts without authentication check
+     * Useful for export functionality when user can't authenticate
+     */
+    public getAllChatHistory(): AccountKeyedChatHistory | null {
+        return this.storage.get<AccountKeyedChatHistory | null>(this.KEY_LOCAL_HISTORY, null)
+    }
+
     public async setChatHistory(
         authStatus: Pick<AuthenticatedAuthStatus, 'endpoint' | 'username'>,
         history: UserLocalHistory
